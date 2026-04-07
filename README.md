@@ -1,4 +1,4 @@
-# Pay_Roll-JDBC :
+# Employee_PayRoll-JDBC :
 
 # 💼 Employee Payroll Management System
 
