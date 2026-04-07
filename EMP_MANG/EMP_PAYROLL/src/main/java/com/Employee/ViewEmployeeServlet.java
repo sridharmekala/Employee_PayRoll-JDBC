@@ -8,9 +8,7 @@ import java.sql.Statement;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 @WebServlet("/viewEmployees")
 public class ViewEmployeeServlet extends HttpServlet {
@@ -19,55 +17,39 @@ public class ViewEmployeeServlet extends HttpServlet {
                          HttpServletResponse response)
             throws ServletException, IOException {
 
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        out.println("<html>");
+        out.println("<head>");
+
+        out.println("<title>Employee Management Dashboard</title>");
+
+        out.println("<style>");
+        out.println("body{font-family:Arial;background:linear-gradient(to right,#4facfe,#00f2fe);margin:0;padding:0;text-align:center;}");
+        out.println(".container{width:80%;margin:80px auto;background:white;padding:30px;border-radius:10px;box-shadow:0 0 15px gray;}");
+        out.println("h1{margin-bottom:20px;color:#333;}");
+        out.println("table{width:100%;border-collapse:collapse;margin-top:20px;}");
+        out.println("th,td{padding:12px;border:1px solid #ddd;text-align:center;}");
+        out.println("th{background:#007bff;color:white;}");
+        out.println("tr:nth-child(even){background:#f2f2f2;}");
+        out.println("tr:hover{background:#e6f2ff;}");
+        out.println("a{padding:6px 12px;border-radius:4px;text-decoration:none;color:white;font-size:14px;}");
+        out.println(".edit{background:#28a745;}");
+        out.println(".delete{background:#dc3545;}");
+        out.println(".home{display:inline-block;margin-top:20px;padding:10px 20px;background:#007bff;color:white;border-radius:5px;text-decoration:none;}");
+        out.println("</style>");
+
+        out.println("</head>");
+        out.println("<body>");
+        out.println("<div class='container'>");
+        out.println("<h1>Employee Records Management</h1>");
+
         try {
 
             Connection con = DBConnection.getConnection();
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery("SELECT * FROM employees");
-
-            response.setContentType("text/html");
-            PrintWriter out = response.getWriter();
-
-            out.println("<html>");
-            out.println("<head>");
-
-            out.println("<title>Employee Management Dashboard</title>");
-
-            out.println("<style>");
-
-            out.println("body{font-family:Arial;background:linear-gradient(to right,#4facfe,#00f2fe);margin:0;padding:0;text-align:center;}");
-
-            out.println(".container{width:80%;margin:80px auto;background:white;padding:30px;border-radius:10px;box-shadow:0 0 15px gray;}");
-
-            out.println("h1{margin-bottom:20px;color:#333;}");
-
-            out.println("table{width:100%;border-collapse:collapse;margin-top:20px;}");
-
-            out.println("th,td{padding:12px;border:1px solid #ddd;text-align:center;}");
-
-            out.println("th{background:#007bff;color:white;}");
-
-            out.println("tr:nth-child(even){background:#f2f2f2;}");
-
-            out.println("tr:hover{background:#e6f2ff;}");
-
-            out.println("a{padding:6px 12px;border-radius:4px;text-decoration:none;color:white;font-size:14px;}");
-
-            out.println(".edit{background:#28a745;}");
-
-            out.println(".delete{background:#dc3545;}");
-
-            out.println(".home{display:inline-block;margin-top:20px;padding:10px 20px;background:#007bff;color:white;border-radius:5px;text-decoration:none;}");
-
-            out.println("</style>");
-
-            out.println("</head>");
-
-            out.println("<body>");
-
-            out.println("<div class='container'>");
-
-            out.println("<h1>Employee Records Management</h1>");
 
             out.println("<table>");
 
@@ -79,12 +61,14 @@ public class ViewEmployeeServlet extends HttpServlet {
             out.println("<th>Actions</th>");
             out.println("</tr>");
 
+            boolean hasData = false;
+
             while (rs.next()) {
+                hasData = true;
 
                 int id = rs.getInt("id");
 
                 out.println("<tr>");
-
                 out.println("<td>" + id + "</td>");
                 out.println("<td>" + rs.getString("name") + "</td>");
                 out.println("<td>" + rs.getString("department") + "</td>");
@@ -98,17 +82,28 @@ public class ViewEmployeeServlet extends HttpServlet {
                 out.println("</tr>");
             }
 
+            if (!hasData) {
+                out.println("<tr><td colspan='5'>No Employees Found</td></tr>");
+            }
+
             out.println("</table>");
 
-            out.println("<a class='home' href='dashboard.html'>Back to Home</a>");
-
-            out.println("</div>");
-
-            out.println("</body>");
-            out.println("</html>");
+            rs.close();
+            st.close();
+            con.close();
 
         } catch (Exception e) {
+
             e.printStackTrace();
+
+            // 🔥 IMPORTANT: SHOW ERROR (no blank page)
+            out.println("<h2 style='color:red;'>Error: " + e.getMessage() + "</h2>");
         }
+
+        out.println("<a class='home' href='dashboard.html'>Back to Home</a>");
+
+        out.println("</div>");
+        out.println("</body>");
+        out.println("</html>");
     }
 }
